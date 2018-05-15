@@ -1,8 +1,8 @@
 {
-  "name": "meiligao",
+  "name": "c2stek-gprs-server",
   "version": "0.0.8",
-  "description": "Nodejs implementation of Meiligao communication protocol",
-  "author": "Alexander Vasin <hello@alvass.in>",
+  "description": "Nodejs implementation of C2STEK gprs device communication protocol",
+  "author": "Juan Pablo Kaniefsky <jpkaniefsky@gmail.com>",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -12,14 +12,14 @@
     "url": "https://github.com/alvassin/nodejs-meiligao/issues"
   },
   "keywords": [
-    "Meiligao", 
-    "Meitrack", 
-    "tracker", 
-    "gps", 
-    "GT30i", 
-    "GT60", 
+    "Meiligao",
+    "Meitrack",
+    "tracker",
+    "gps",
+    "GT30i",
+    "GT60",
     "VT300",
-    "VT310", 
+    "VT310",
     "VT400"
   ],
   "dependencies": {
@@ -27,5 +27,11 @@
     "extend": "*"
   },
   "analyze": true,
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "ava": "1.0.0-beta.4"
+  },
+  "scripts": {
+    "test": "ava -s"
+  }
 }
