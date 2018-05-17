@@ -17,8 +17,12 @@ test.beforeEach.cb(t => {
     t.context.socket = new Socket();
     t.context.socket.connect(20180);
 
-    t.context.login = () => t.context.socket.write("PA$353990030327618$20$AP");
-    t.context.heartbeat = () => t.context.socket.write("PA$353990030327618$22$AP");
+    t.context.login = (cb) => t.context.socket.write("PA$353990030327618$20$AP", "utf8", () => {
+        if (cb) {
+            t.context.socket.on("data", data => data.toString() === "PA$353990030327618$20$AP" ? cb() : 0);
+        }
+    });
+    t.context.heartbeat = (cb) => t.context.socket.write("PA$353990030327618$22$AP", "utf8", cb);
 });
 
 test.afterEach.cb(t => {
@@ -31,7 +35,7 @@ test.afterEach.cb(t => {
     t.context.tracker.disconnect();
 });
 
-test.cb("should recognize device login", t => {
+test.cb("recognizes device login", t => {
     t.context.tracker.on("login", function() {
         t.pass();
         t.end();
@@ -39,7 +43,7 @@ test.cb("should recognize device login", t => {
     t.context.login();
 });
 
-test.cb("should respond to device login", t => {
+test.cb("responds to device login", t => {
     t.context.socket.on("data", data => {
         t.is(data.toString(), "PA$353990030327618$20$AP");
         t.end();
@@ -47,7 +51,7 @@ test.cb("should respond to device login", t => {
     t.context.login();
 });
 
-test.cb("should recognize heartbeat", t => {
+test.cb("recognizes heartbeat", t => {
     t.context.tracker.on("heartbeat", () => {
         t.pass();
         t.end();
@@ -55,7 +59,7 @@ test.cb("should recognize heartbeat", t => {
     t.context.heartbeat();
 });
 
-test.cb("should respond to heartbeat", t => {
+test.cb("responds to heartbeat", t => {
     t.context.socket.on("data", function(data){
         t.is(data.toString(), "PA$353990030327618$22$AP");
         t.end();
@@ -82,6 +86,36 @@ test.cb("triggers error and displays original payload when failed to parse a mes
         t.end();
     });
     t.context.socket.write("21321sdsad/(&%&%$/$)0x8766");
+});
+
+test.cb("sets up timed reports and report success", t => {
+    t.context.login(() => {
+        t.context.socket.on("data", data => {
+            t.is(data.toString(), "PA$2$02$1#00000A$AP");
+            t.context.socket.write("PA$353990030327618$2$02$AP");
+        });
+        t.context.tracker.setReportTimeInterval("00:00:10", (err, result) => {
+            if (err) throw err;
+            
+            t.is(result, "success");
+            t.end();
+        });
+    });
+});
+
+test.cb("disables timed reports and report success", t => {
+    t.context.login(() => {
+        t.context.socket.on("data", data => {
+            t.is(data.toString(), "PA$2$02$0#000000$AP");
+            t.context.socket.write("PA$353990030327618$2$02$AP");
+        });
+        t.context.tracker.setReportTimeInterval("00:00:00", (err, result) => {
+            if (err) throw err;
+            
+            t.is(result, "success");
+            t.end();
+        });
+    });
 });
 
 // test.cb("queries gps location correctly", t => {
