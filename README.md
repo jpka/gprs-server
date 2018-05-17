@@ -1,24 +1,25 @@
 # Quickstart
-This is nodejs implementation of Meiligao protocol (GPRS communication protocol between server & [Meitrack](http://www.meitrack.net/)) GPS trackers. It supports following trackers: GT30i, GT60, VT300, VT310, VT400.
+This is nodejs implementation of C2STEK protocol (GPRS communication protocol between server & C2STEK GPS trackers. It supports following trackers: MT-20, CAT-1X
 
-To start, install this module with command `npm install meiligao` and see [events handling](https://github.com/alvassin/nodejs-meiligao/blob/master/examples/events.js) and [command execution](https://github.com/alvassin/nodejs-meiligao/blob/master/examples/commands.js) examples.
+# Examples
+[Events](https://github.com/nanodt/c2stek-gprs-server/blob/master/examples/events.js) and [command execution](https://github.com/nanodt/c2stek-gprs-server/blob/master/examples/commands.js) examples.
 
-# meiligao.Server
-Designed to handle tracker connections. Accepts `timeout` option, that is automatically passed to `meiligao.Tracker` objects.
+# Server
+Designed to handle tracker connections. Accepts `timeout` option, that is automatically passed to `Tracker` objects.
 
 ```js
-var meiligao = require('meiligao');
-var server = new meiligao.Server({ timeout: 120000 });
+var c2stek = require('c2stek-gprs-server');
+var server = new c2stek.Server({ timeout: 120000 });
 ```
 
 ## Events
 #### connect
-Is emitted when tracker establishes connect with `meiligao.Server`. Parameters: 
-* `tracker`: `meiligao.Tracker` object
+Is emitted when tracker establishes connect with `Server`. Parameters: 
+* `tracker`: `Tracker` object
 
 #### disconnect
 Is emitted when tracker closes connection. Parameters: 
-* `tracker`: `meiligao.Tracker` object
+* `tracker`: `Tracker` object
 
 ## Methods
 #### listen	
@@ -36,13 +37,13 @@ server.listen(20180, function(error) {
 });
 ```
 
-# meiligao.Tracker
-Designed to iteract with GPS trackers. Accepts `timeout` option, (which is passed automatically by `meiligao.Server`).
+# Tracker
+Designed to iteract with GPS trackers. Accepts `timeout` option, (which is passed automatically by `Server`).
 
 ```js
-var meiligao = require('meiligao');
+var c2stek = require('c2stek-gprs-server');
 
-var server = new meiligao.Server({
+var server = new c2stek.Server({
     timeout: 120000
 }).listen(20180, function(error) {
     if (error) throw error;
@@ -56,7 +57,7 @@ server.on('connect', function(tracker) {
 
 ## Events
 #### heartbeat
-Heartbeat is `0x00` message sent by tracker over time. You can configure it's interval using `tracker.setHeartbeatInterval` method.
+Heartbeat is message with command code `22` sent by tracker over time. You can configure it's interval using `tracker.setHeartbeatInterval` method.
 
 #### error
 Is emitted when it is not possible to parse tracker's message. Parameters:
@@ -65,16 +66,15 @@ Is emitted when it is not possible to parse tracker's message. Parameters:
  
 #### packet.in
 Is emitted every time message is received from tracker, very useful for debugging. Parameters:
-* `meiligao.Message`: message received from tracker
+* `Message`: message received from tracker
 
 #### packet.out
 Is emitted every time message is passed to tracker, is useful for debugging.
 Parameters:
-* `meiligao.Message`: message sent to tracker
+* `Message`: message sent to tracker
 
 #### login
-Is emitted after tracker sent `0x5000` login request & successful login confirmation `0x4000` was sent back. In fact, login request can not be used for real authentication, it tells that data sent by tracker will be accepted by server. 
-If you need to implement authentication, use `tracker.getSnImei` method to receive tracker's data & then `tracker.disconnect` to disconnect non-authenticated trackers.
+Is emitted after tracker sent login request with command code `20` & successful login confirmation with command code `20` was sent back. In fact, login request can not be used for real authentication, it tells that data sent by tracker will be accepted by server. 
 
 #### message
 Is emitted every time tracker sends alarm or report. Parameters:
@@ -94,9 +94,9 @@ Is emitted after connection is timed out (timeout can be configured in Tracker o
 Close tracker connection.
 
 ```js
-var meiligao = require('meiligao');
+var c2stek = require('c2stek-gprs-server');
 
-var server = new meiligao.Server().listen(20180, function(error) {
+var server = new c2stek.Server().listen(20180, function(error) {
   if (error) throw error;
   console.log('gps server is listening');
 });
@@ -110,6 +110,26 @@ server.on('connect', function(tracker) {
   tracker.disconnect();
 });
 ```
+
+#### setReportTimeInterval
+Set reporting time interval (internal cmd code: `02`).
+
+Parameter | Type     | Description
+----------|----------|------------
+interval  | string   | Hours:Minutes:Seconds
+callback  | function | User callback
+
+```js
+tracker.setReportTimeInterval("00:00:10", function(err, result){
+  if (err) {
+    console.log('SET REPORT TIME INTERVAL ERROR: ', err);
+  } else {
+    console.log('SET REPORT TIME INTERVAL: ', result);
+  }
+});
+```
+
+## Not functional (everything below is not adapted from original [meiligao server](https://github.com/alvassin/nodejs-meiligao) implementation)
 
 #### requestReport
 Request GPS report (internal: track on demand `0x4101`)
@@ -369,25 +389,7 @@ tracker.getReportTimeInterval(function(err, interval){
     console.log('GET REPORT TIME INTERVAL: ', interval);
   }
 });
-```
 
-#### setReportTimeInterval
-Set reporting time interval (internal: `0x4102`, `0x5100`).
-
-Parameter | Type     | Description
-----------|----------|------------
-interval  | integer  | Reporting time interval, 1 unit = 10 seconds.
-callback  | function | User callback
-
-```js
-tracker.setReportTimeInterval(2, function(err, result){
-  if (err) {
-    console.log('SET REPORT TIME INTERVAL ERROR: ', err);
-  } else {
-    console.log('SET REPORT TIME INTERVAL: ', result);
-  }
-});
-```
 
 #### setReportDistanceInterval
 Set distance report as per pre-set interval. Sends out alarm when the car is moving and stops sending the report when the car is stationary (internal: `0x4303`).
@@ -464,5 +466,5 @@ tracker.setAlarmGeofence(55.753905, 37.620872, 200, function(err, result){
 ```
 
 # Under the hood
-Command names mapping, message types list & all other stuff related to message processing is located in [Message.js](https://github.com/alvassin/nodejs-meiligao/blob/master/lib/Message.js) file. 
-[Original protocol documentation](https://github.com/alvassin/nodejs-meiligao/blob/master/docs/specs.pdf) is also included in case you will need deep understanding how Meiligao protocol works.
+Command names mapping, message types list & all other stuff related to message processing is located in [Message.js](https://github.com/nanodt/c2stek-gprs-server/blob/master/lib/Message.js) file. 
+[Original protocol documentation](https://github.com/nanodt/c2stek-gprs-server/blob/master/docs/Communication%20protocol.pdf) is also included in case you will need deep understanding how C2STEK protocol works.

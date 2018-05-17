@@ -6,21 +6,18 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/alvassin/nodejs-meiligao.git"
+    "url": "https://github.com/nanodt/c2stek-gprs-server.git"
   },
   "bugs": {
-    "url": "https://github.com/alvassin/nodejs-meiligao/issues"
+    "url": "https://github.com/nanodt/C2stek-gprs-server/issues"
   },
   "keywords": [
-    "Meiligao",
-    "Meitrack",
+    "C2STEK",
     "tracker",
     "gps",
-    "GT30i",
-    "GT60",
-    "VT300",
-    "VT310",
-    "VT400"
+    "gprs",
+    "MT-20",
+    "CAT-1X"
   ],
   "dependencies": {
     "crc": "*",
