@@ -1,23 +1,20 @@
 {
-  "name": "c2stek-gprs-server",
+  "name": "gprs-server",
   "version": "0.0.8",
-  "description": "Nodejs implementation of C2STEK gprs device communication protocol",
+  "description": "Nodejs implementation of gprs device communication protocol",
   "author": "Juan Pablo Kaniefsky <jpkaniefsky@gmail.com>",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nanodt/c2stek-gprs-server.git"
+    "url": "https://github.com/nanodt/gprs-server.git"
   },
   "bugs": {
-    "url": "https://github.com/nanodt/C2stek-gprs-server/issues"
+    "url": "https://github.com/nanodt/gprs-server/issues"
   },
   "keywords": [
-    "C2STEK",
     "tracker",
     "gps",
-    "gprs",
-    "MT-20",
-    "CAT-1X"
+    "gprs"
   ],
   "dependencies": {
     "crc": "*",

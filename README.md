@@ -1,15 +1,12 @@
-# Quickstart
-This is nodejs implementation of C2STEK protocol (GPRS communication protocol between server & C2STEK GPS trackers. It supports following trackers: MT-20, CAT-1X
-
 # Examples
-[Events](https://github.com/nanodt/c2stek-gprs-server/blob/master/examples/events.js) and [command execution](https://github.com/nanodt/c2stek-gprs-server/blob/master/examples/commands.js) examples.
+[Events](https://github.com/nanodt/gprs-server/blob/master/examples/events.js) and [command execution](https://github.com/nanodt/gprs-server/blob/master/examples/commands.js) examples.
 
 # Server
 Designed to handle tracker connections. Accepts `timeout` option, that is automatically passed to `Tracker` objects.
 
 ```js
-var c2stek = require('c2stek-gprs-server');
-var server = new c2stek.Server({ timeout: 120000 });
+var gprs = require('gprs-server');
+var server = new gprs.Server({ timeout: 120000 });
 ```
 
 ## Events
@@ -41,9 +38,9 @@ server.listen(20180, function(error) {
 Designed to iteract with GPS trackers. Accepts `timeout` option, (which is passed automatically by `Server`).
 
 ```js
-var c2stek = require('c2stek-gprs-server');
+var gprs = require('gprs-server');
 
-var server = new c2stek.Server({
+var server = new gprs.Server({
     timeout: 120000
 }).listen(20180, function(error) {
     if (error) throw error;
@@ -94,9 +91,9 @@ Is emitted after connection is timed out (timeout can be configured in Tracker o
 Close tracker connection.
 
 ```js
-var c2stek = require('c2stek-gprs-server');
+var gprs = require('gprs-server');
 
-var server = new c2stek.Server().listen(20180, function(error) {
+var server = new gprs.Server().listen(20180, function(error) {
   if (error) throw error;
   console.log('gps server is listening');
 });
@@ -466,5 +463,5 @@ tracker.setAlarmGeofence(55.753905, 37.620872, 200, function(err, result){
 ```
 
 # Under the hood
-Command names mapping, message types list & all other stuff related to message processing is located in [Message.js](https://github.com/nanodt/c2stek-gprs-server/blob/master/lib/Message.js) file. 
-[Original protocol documentation](https://github.com/nanodt/c2stek-gprs-server/blob/master/docs/Communication%20protocol.pdf) is also included in case you will need deep understanding how C2STEK protocol works.
+Command names mapping, message types list & all other stuff related to message processing is located in [Message.js](https://github.com/nanodt/gprs-server/blob/master/lib/Message.js) file. 
+[Original protocol documentation](https://github.com/nanodt/gprs-server/blob/master/docs/Communication%20protocol.pdf) is also included in case you will need deep understanding how this particular GPRS protocol works.
