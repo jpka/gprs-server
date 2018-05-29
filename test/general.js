@@ -83,23 +83,23 @@ test.cb("handles status reports", t => {
 test.cb("handles status reports with invalid data", t => {
   t.context.tracker.on("report", data => {
     t.deepEqual(data.data, {
-        imei: "130839038110",
+        imei: "IMEI",
         date: null,
         latitude: null,
         longitude: null
     });
     t.end();
   });
-  t.context.socket.write("PA$130839038110#DDMMAA#171229#Latitud#Longitud#999#360#9999#39#122#12#XXXX");
+  t.context.socket.write("PA$IMEI#DDMMAA#171229#Latitud#Longitud#999#360#9999#39#122#12#XXXX");
 });
 
-// test.cb("triggers error and displays original payload when failed to parse a message", t => {
-//     t.context.tracker.on("error", (error, buffer) => {
-//         t.is(buffer.toString(), "21321sdsad/(&%&%$/$)0x8766");
-//         t.end();
-//     });
-//     t.context.socket.write("21321sdsad/(&%&%$/$)0x8766");
-// });
+test.cb("triggers error and displays original payload when failed to parse a message", t => {
+    t.context.tracker.on("error", (error, buffer) => {
+        t.is(buffer.toString(), "21321sdsad/(&%&%$/$)0x8766");
+        t.end();
+    });
+    t.context.socket.write("21321sdsad/(&%&%$/$)0x8766");
+});
 
 // test.cb("sets up timed reports and report success", t => {
 //     t.context.login(() => {
