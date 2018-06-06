@@ -26,6 +26,6 @@
     "ava": "1.0.0-beta.4"
   },
   "scripts": {
-    "test": "ava -s"
+    "test": "ava -s --timeout=3s"
   }
 }

@@ -17,12 +17,16 @@ test.beforeEach.cb(t => {
     t.context.socket = new Socket();
     t.context.socket.connect(20180);
 
-    // t.context.login = (cb) => t.context.socket.write("PA$353990030327618$20$AP", "utf8", () => {
-    //     if (cb) {
-    //         t.context.socket.on("data", data => data.toString() === "PA$353990030327618$20$AP" ? cb() : 0);
-    //     }
-    // });
-    t.context.heartbeat = (cb) => t.context.socket.write("HB$353990030327618#22", "utf8", cb);
+    t.context.imei1 = 353990030327618;
+    t.context.pin1 = 22672;
+    t.context.heartbeat = (cb) => t.context.socket.write(`HB$${t.context.imei1}#22`, "utf8", () => {
+        if (cb) {
+            t.context.socket.on("data", data => {
+              if (data.toString() === `HB$${t.context.imei1}#21`) cb();
+            });
+        }
+    });
+    // t.context.heartbeat = (cb) => t.context.socket.write(`HB$${t.context.imei1}#22`, "utf8", cb);
 });
 
 test.afterEach.cb(t => {
@@ -99,6 +103,61 @@ test.cb("triggers error and displays original payload when failed to parse a mes
         t.end();
     });
     t.context.socket.write("21321sdsad/(&%&%$/$)0x8766");
+});
+
+test.cb("enables silent alarm", t => {
+    t.context.heartbeat(() => {
+        t.context.socket.on("data", data => {
+            t.is(data.toString(), `CO$${t.context.pin1}#S1`);
+            t.context.socket.write(`CO$${t.context.imei1}#S1`);
+        });
+        t.context.tracker.setSilentAlarm(true, (err) => {
+            t.is(err, null);
+            t.end();
+        });
+    });
+});
+
+test.cb("disables silent alarm", t => {
+  t.context.heartbeat(() => {
+      t.context.socket.on("data", data => {
+          t.is(data.toString(), `CO$${t.context.pin1}#S0`);
+          t.context.socket.write(`CO$${t.context.imei1}#S0`);
+      });
+      t.context.tracker.setSilentAlarm(false, (err) => {
+          t.is(err, null);
+          t.end();
+      });
+  });
+});
+
+test.cb("silent alarm set throws error if response was incorrect", t => {
+  let answer = `CO$${t.context.imei1}#asdsad`;
+  t.context.heartbeat(() => {
+      t.context.socket.on("data", data => {
+          t.is(data.toString(), `CO$${t.context.pin1}#S0`);
+          t.context.socket.write(answer);
+      });
+      t.context.tracker.setSilentAlarm(false, (err) => {
+          t.truthy(err);
+          t.true(err.message.indexOf(answer) > -1);
+          t.end();
+      });
+  });
+});
+
+test.cb("request queue works with silent alarm set", t => {
+    t.context.tracker.setSilentAlarm(true, (err) => {
+        t.is(err, null);
+        t.end();
+    });
+    setTimeout(() => {  
+      t.context.socket.on("data", data => {
+        t.true(data.toString().indexOf(`CO$${t.context.pin1}#S1`) > -1);
+        t.context.socket.write(`CO$${t.context.imei1}#S1`);
+      });
+      t.context.heartbeat();
+    }, 1000);
 });
 
 // test.cb("sets up timed reports and report success", t => {
