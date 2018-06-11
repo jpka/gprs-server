@@ -160,6 +160,19 @@ test.cb("request queue works with silent alarm set", t => {
     }, 1000);
 });
 
+test.cb("handles status reports with no data", t => {
+  t.context.tracker.on("report", data => {
+    t.deepEqual(data.data, {
+        imei: null,
+        date: null,
+        latitude: null,
+        longitude: null
+    });
+    t.end();
+  });
+  t.context.socket.write("PA$");
+});
+
 // test.cb("sets up timed reports and report success", t => {
 //     t.context.login(() => {
 //         t.context.socket.on("data", data => {
