@@ -99,10 +99,10 @@ test.cb("handles status reports with invalid data", t => {
 
 test.cb("triggers error and displays original payload when failed to parse a message", t => {
     t.context.tracker.on("error", (error, buffer) => {
-        t.is(buffer.toString(), "21321sdsad/(&%&%$/$)0x8766");
+        t.is(buffer.toString(), "21321sdsad/(&%&%/)0x8766");
         t.end();
     });
-    t.context.socket.write("21321sdsad/(&%&%$/$)0x8766");
+    t.context.socket.write("21321sdsad/(&%&%/)0x8766");
 });
 
 test.cb("enables silent alarm", t => {
