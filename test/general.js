@@ -77,7 +77,27 @@ test.cb("handles status reports", t => {
             imei: "353990030327618",
             date: new Date("2018-10-01T13:30:15.000Z"),
             latitude: 22.64611,
-            longitude: 113.82682
+            longitude: 113.82682,
+            speed: 120,
+            heading: 115,
+            altitude: 85,
+            internalBattery: 3.8,
+            vehicleBattery: 12.1,
+            gsmSignal: 25,
+            gpsSatellites: 8,
+            vehicleContact: false,
+            accelerometer: false,
+            energySavings: false,
+            externalFeed: true,
+            gpsState: false,
+            systemArmed: false,
+            engineCut: true,
+            siren: false,
+            ain2: false,
+            din1: false,
+            din2: false,
+            din3: true,
+            din4: true
         });
         t.end();
     });
@@ -90,11 +110,31 @@ test.cb("handles status reports with invalid data", t => {
         imei: "IMEI",
         date: null,
         latitude: null,
-        longitude: null
+        longitude: null,
+        speed: null,
+        heading: null,
+        altitude: null,
+        internalBattery: null,
+        vehicleBattery: null,
+        gsmSignal: null,
+        gpsSatellites: null,
+        vehicleContact: null,
+        accelerometer: null,
+        energySavings: null,
+        externalFeed: null,
+        gpsState: null,
+        systemArmed: null,
+        engineCut: null,
+        siren: null,
+        ain2: null,
+        din1: null,
+        din2: null,
+        din3: null,
+        din4: null
     });
     t.end();
   });
-  t.context.socket.write("PA$IMEI#DDMMAA#171229#Latitud#Longitud#999#360#9999#39#122#12#XXXX");
+  t.context.socket.write("PA$IMEI#DDMMAA#dsad#Latitud#Longitud#asds#asdsa#asdasd#dasd#sds#xx#XXXX");
 });
 
 test.cb("triggers error and displays original payload when failed to parse a message", t => {
@@ -111,7 +151,27 @@ test.cb("handles status reports with no data", t => {
         imei: null,
         date: null,
         latitude: null,
-        longitude: null
+        longitude: null,
+        speed: null,
+        heading: null,
+        altitude: null,
+        internalBattery: null,
+        vehicleBattery: null,
+        gsmSignal: null,
+        gpsSatellites: null,
+        vehicleContact: null,
+        accelerometer: null,
+        energySavings: null,
+        externalFeed: null,
+        gpsState: null,
+        systemArmed: null,
+        engineCut: null,
+        siren: null,
+        ain2: null,
+        din1: null,
+        din2: null,
+        din3: null,
+        din4: null
     });
     t.end();
   });

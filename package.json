@@ -18,7 +18,8 @@
   ],
   "dependencies": {
     "crc": "*",
-    "extend": "*"
+    "extend": "*",
+    "hex-to-binary": "^1.0.1"
   },
   "analyze": true,
   "license": "MIT",
