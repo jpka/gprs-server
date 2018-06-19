@@ -72,7 +72,9 @@ test.cb("responds to heartbeat", t => {
 });
 
 test.cb("handles status reports", t => {
+    const message = "PA$353990030327618#011018#133015#+22.64611#+113.82682#120#115#085#38#121#25#8#121812";
     t.context.tracker.on("report", data => {
+        t.is(data.raw, message);
         t.deepEqual(data.data, {
             imei: "353990030327618",
             date: new Date("2018-10-01T13:30:15.000Z"),
@@ -101,7 +103,7 @@ test.cb("handles status reports", t => {
         });
         t.end();
     });
-    t.context.socket.write("PA$353990030327618#011018#133015#+22.64611#+113.82682#120#115#085#38#121#25#8#121812");
+    t.context.socket.write(message);
 });
 
 test.cb("handles status reports with invalid data", t => {
@@ -231,4 +233,27 @@ test.cb("request queue works with silent alarm set", t => {
       });
       t.context.heartbeat();
     }, 1000);
+});
+
+test.cb("recognizes alarm", t => {
+  const message = "AA$353990030327618#011018#133015#+22.64611#+113.82682#SG";
+  t.context.tracker.on("alarm", (data) => {
+      t.is(data.raw, message);
+      t.is(data.type, "accelerometer");
+      t.deepEqual(data.data, {
+        date: new Date("2018-10-01T13:30:15.000Z"), 
+        latitude: 22.64611,
+        longitude: 113.82682
+      });
+      t.end();
+  });
+  t.context.socket.write(message);
+});
+
+test.cb("responds to alarm", t => {
+  t.context.socket.on("data", function(data){
+      t.is(data.toString(), "AA$1#SG");
+      t.end();
+  });
+  t.context.socket.write("AA$353990030327618#011018#133015#+22.64611#+113.82682#SG");
 });
