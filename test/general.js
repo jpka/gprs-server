@@ -180,40 +180,40 @@ test.cb("handles status reports with no data", t => {
   t.context.socket.write("PA$");
 });
 
-test.cb("enables silent alarm", t => {
+test.cb("arms alarm", t => {
     t.context.heartbeat(() => {
         t.context.socket.on("data", data => {
             t.is(data.toString(), `CO$${t.context.pin1}#S1`);
             t.context.socket.write(`CO$${t.context.imei1}#S1`);
         });
-        t.context.tracker.setFlag("silent alarm", true, (err) => {
+        t.context.tracker.setFlag("alarm armed", true, (err) => {
             t.is(err, null);
             t.end();
         });
     });
 });
 
-test.cb("disables silent alarm", t => {
+test.cb("disarms alarm", t => {
   t.context.heartbeat(() => {
       t.context.socket.on("data", data => {
           t.is(data.toString(), `CO$${t.context.pin1}#S0`);
           t.context.socket.write(`CO$${t.context.imei1}#S0`);
       });
-      t.context.tracker.setFlag("silent alarm", false, (err) => {
+      t.context.tracker.setFlag("alarm armed", false, (err) => {
           t.is(err, null);
           t.end();
       });
   });
 });
 
-test.cb("silent alarm set throws error if response was incorrect", t => {
+test.cb("alarm arm throws error if response was incorrect", t => {
   let answer = `CO$${t.context.imei1}#asdsad`;
   t.context.heartbeat(() => {
       t.context.socket.on("data", data => {
           t.is(data.toString(), `CO$${t.context.pin1}#S0`);
           t.context.socket.write(answer);
       });
-      t.context.tracker.setFlag("silent alarm", false, (err) => {
+      t.context.tracker.setFlag("alarm armed", false, (err) => {
           t.truthy(err);
           t.true(err.message.indexOf(answer) > -1);
           t.end();
@@ -221,8 +221,8 @@ test.cb("silent alarm set throws error if response was incorrect", t => {
   });
 });
 
-test.cb("request queue works with silent alarm set", t => {
-    t.context.tracker.setFlag("silent alarm", true, (err) => {
+test.cb("request queue works with alarm armed set", t => {
+    t.context.tracker.setFlag("alarm armed", true, (err) => {
         t.is(err, null);
         t.end();
     });
