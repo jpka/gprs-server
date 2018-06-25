@@ -18,7 +18,7 @@ test.beforeEach.cb(t => {
     t.context.socket.connect(20180);
 
     t.context.imei1 = 353990030327618;
-    t.context.pin1 = 22672;
+    t.context.pin1 = 103752;
     t.context.heartbeat = (cb) => t.context.socket.write(`HB$${t.context.imei1}#22`, "utf8", () => {
         if (cb) {
             t.context.socket.on("data", data => {
