@@ -72,14 +72,14 @@ test.cb("responds to heartbeat", t => {
 });
 
 test.cb("handles status reports", t => {
-    const message = "PA$353990030327618#011018#133015#+22.64611#+113.82682#120#115#085#38#121#25#8#121812";
+    const message = "PA$353990030327618#011018#133015#3717.322482#N#00603.235948#W#120#115#085#38#121#25#8#121812";
     t.context.tracker.on("report", data => {
         t.is(data.raw, message);
         t.deepEqual(data.data, {
             imei: "353990030327618",
             date: new Date("2018-10-01T13:30:15.000Z"),
-            latitude: 22.64611,
-            longitude: 113.82682,
+            latitude: 37.288708033333336,
+            longitude: -6.053932466666667,
             speed: 120,
             heading: 115,
             altitude: 85,
@@ -136,7 +136,7 @@ test.cb("handles status reports with invalid data", t => {
     });
     t.end();
   });
-  t.context.socket.write("PA$IMEI#DDMMAA#dsad#Latitud#Longitud#asds#asdsa#asdasd#dasd#sds#xx#XXXX");
+  t.context.socket.write("PA$IMEI#DDMMAA#dsad#Latitud#S#Longitud#E#asds#asdsa#asdasd#dasd#sds#xx#XXXX");
 });
 
 test.cb("triggers error and displays original payload when failed to parse a message", t => {
@@ -236,14 +236,14 @@ test.cb("request queue works with alarm armed set", t => {
 });
 
 test.cb("recognizes alarm", t => {
-  const message = "AA$353990030327618#011018#133015#+22.64611#+113.82682#SG";
+  const message = "AA$353990030327618#011018#133015#22.64611#S#113.82682#E#SG";
   t.context.tracker.on("alarm", (data) => {
       t.is(data.raw, message);
       t.is(data.type, "accelerometer");
       t.deepEqual(data.data, {
         date: new Date("2018-10-01T13:30:15.000Z"), 
-        latitude: 22.64611,
-        longitude: 113.82682
+        latitude: -22.0107685,
+        longitude: 113.01378033333333
       });
       t.end();
   });
@@ -255,5 +255,5 @@ test.cb("responds to alarm", t => {
       t.is(data.toString(), "AA$1#SG");
       t.end();
   });
-  t.context.socket.write("AA$353990030327618#011018#133015#+22.64611#+113.82682#SG");
+  t.context.socket.write("AA$353990030327618#011018#133015#22.64611#S#113.82682#E#SG");
 });
