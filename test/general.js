@@ -257,3 +257,31 @@ test.cb("responds to alarm", t => {
   });
   t.context.socket.write("AA$353990030327618#011018#133015#22.64611#S#113.82682#E#SG");
 });
+
+test.cb("sets up the accelerometer sensibility", t => {
+    t.context.heartbeat(() => {
+        t.context.socket.on("data", data => {
+            t.is(data.toString(), `CO$${t.context.pin1}#AC13`);
+            t.context.socket.write(`CO$${t.context.imei1}#AC13`);
+        });
+        t.context.tracker.setAccelerometerSensibility(13, (err) => {
+            t.is(err, null);
+            t.end();
+        });
+    });
+});
+
+test.cb("throws an error if the device responds incorrectly yo acc sensibility set", t => {
+    let answer = `CO$${t.context.imei1}#XCXZCX`;
+    t.context.heartbeat(() => {
+        t.context.socket.on("data", data => {
+            t.is(data.toString(), `CO$${t.context.pin1}#AC13`);
+            t.context.socket.write(answer);
+        });
+        t.context.tracker.setAccelerometerSensibility(13, (err) => {
+            t.truthy(err);
+            t.true(err.message.indexOf(answer) > -1);
+            t.end();
+        });
+    });
+});
