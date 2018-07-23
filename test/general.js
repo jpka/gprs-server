@@ -183,7 +183,7 @@ test.cb("handles status reports with no data", t => {
 test.cb("arms alarm", t => {
     t.context.heartbeat(() => {
         t.context.socket.on("data", data => {
-            t.is(data.toString(), `CO$${t.context.pin1}#S1`);
+            t.is(data.toString(), `CO$${t.context.pin1}#S1\r`);
             t.context.socket.write(`CO$${t.context.imei1}#S1`);
         });
         t.context.tracker.setFlag("alarm armed", true, (err) => {
@@ -196,7 +196,7 @@ test.cb("arms alarm", t => {
 test.cb("disarms alarm", t => {
   t.context.heartbeat(() => {
       t.context.socket.on("data", data => {
-          t.is(data.toString(), `CO$${t.context.pin1}#S0`);
+          t.is(data.toString(), `CO$${t.context.pin1}#S0\r`);
           t.context.socket.write(`CO$${t.context.imei1}#S0`);
       });
       t.context.tracker.setFlag("alarm armed", false, (err) => {
@@ -210,7 +210,7 @@ test.cb("alarm arm throws error if response was incorrect", t => {
   let answer = `CO$${t.context.imei1}#asdsad`;
   t.context.heartbeat(() => {
       t.context.socket.on("data", data => {
-          t.is(data.toString(), `CO$${t.context.pin1}#S0`);
+          t.is(data.toString(), `CO$${t.context.pin1}#S0\r`);
           t.context.socket.write(answer);
       });
       t.context.tracker.setFlag("alarm armed", false, (err) => {
@@ -219,20 +219,6 @@ test.cb("alarm arm throws error if response was incorrect", t => {
           t.end();
       });
   });
-});
-
-test.cb("request queue works with alarm armed set", t => {
-    t.context.tracker.setFlag("alarm armed", true, (err) => {
-        t.is(err, null);
-        t.end();
-    });
-    setTimeout(() => {  
-      t.context.socket.on("data", data => {
-        t.true(data.toString().indexOf(`CO$${t.context.pin1}#S1`) > -1);
-        t.context.socket.write(`CO$${t.context.imei1}#S1`);
-      });
-      t.context.heartbeat();
-    }, 1000);
 });
 
 test.cb("recognizes alarm", t => {
@@ -261,7 +247,7 @@ test.cb("responds to alarm", t => {
 test.cb("sets up the accelerometer sensibility", t => {
     t.context.heartbeat(() => {
         t.context.socket.on("data", data => {
-            t.is(data.toString(), `CO$${t.context.pin1}#AC13`);
+            t.is(data.toString(), `CO$${t.context.pin1}#AC13\r`);
             t.context.socket.write(`CO$${t.context.imei1}#AC13`);
         });
         t.context.tracker.setAccelerometerSensibility(13, (err) => {
@@ -271,11 +257,11 @@ test.cb("sets up the accelerometer sensibility", t => {
     });
 });
 
-test.cb("throws an error if the device responds incorrectly yo acc sensibility set", t => {
+test.cb("throws an error if the device responds incorrectly to acc sensibility set", t => {
     let answer = `CO$${t.context.imei1}#XCXZCX`;
     t.context.heartbeat(() => {
         t.context.socket.on("data", data => {
-            t.is(data.toString(), `CO$${t.context.pin1}#AC13`);
+            t.is(data.toString(), `CO$${t.context.pin1}#AC13\r`);
             t.context.socket.write(answer);
         });
         t.context.tracker.setAccelerometerSensibility(13, (err) => {
