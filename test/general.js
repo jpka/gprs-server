@@ -22,7 +22,7 @@ test.beforeEach.cb(t => {
     t.context.heartbeat = (cb) => t.context.socket.write(`HB$${t.context.imei1}#22`, "utf8", () => {
         if (cb) {
             t.context.socket.on("data", data => {
-              if (data.toString() === `HB$${t.context.imei1}#21`) cb();
+              if (data.toString() === `HB$${t.context.imei1}#21\r`) cb();
             });
         }
     });
@@ -65,7 +65,7 @@ test.cb("recognizes heartbeat", t => {
 
 test.cb("responds to heartbeat", t => {
     t.context.socket.on("data", function(data){
-        t.is(data.toString(), "HB$353990030327618#21");
+        t.is(data.toString(), "HB$353990030327618#21\r");
         t.end();
     });
     t.context.heartbeat();
@@ -184,7 +184,7 @@ test.cb("arms alarm", t => {
     t.context.heartbeat(() => {
         t.context.socket.on("data", data => {
             t.is(data.toString(), `CO$${t.context.pin1}#S1\r`);
-            t.context.socket.write(`CO$${t.context.imei1}#S1`);
+          t.context.socket.write(`CO$${t.context.imei1}#S1`);
         });
         t.context.tracker.setFlag("alarm armed", true, (err) => {
             t.is(err, null);
@@ -197,7 +197,7 @@ test.cb("disarms alarm", t => {
   t.context.heartbeat(() => {
       t.context.socket.on("data", data => {
           t.is(data.toString(), `CO$${t.context.pin1}#S0\r`);
-          t.context.socket.write(`CO$${t.context.imei1}#S0`);
+        t.context.socket.write(`CO$${t.context.imei1}#S0`);
       });
       t.context.tracker.setFlag("alarm armed", false, (err) => {
           t.is(err, null);
@@ -238,7 +238,7 @@ test.cb("recognizes alarm", t => {
 
 test.cb("responds to alarm", t => {
   t.context.socket.on("data", function(data){
-      t.is(data.toString(), "AA$1#SG");
+      t.is(data.toString(), "AA$1#SG\r");
       t.end();
   });
   t.context.socket.write("AA$353990030327618#011018#133015#22.64611#S#113.82682#E#SG");
