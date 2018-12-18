@@ -2,6 +2,12 @@ import test from "ava";
 import Server from "../lib/Server";
 import {Socket} from "net";
 
+const examples = {
+    reports: {
+        complete: "PA$353990030327618#011018#133015#3717.322482#N#00603.235948#W#120#115#085#38#121#25#8#121812"
+    }
+};
+
 test.beforeEach.cb(t => {
     t.context.server = (new Server()).listen(20180, function(error) {
         if (error) {
@@ -267,6 +273,22 @@ test.cb("throws an error if the device responds incorrectly to acc sensibility s
         t.context.tracker.setAccelerometerSensibility(13, (err) => {
             t.truthy(err);
             t.true(err.message.indexOf(answer) > -1);
+            t.end();
+        });
+    });
+});
+
+test.cb("sends request for report", t => {
+    t.context.heartbeat(() => {
+        t.context.socket.on("data", data => {
+            t.is(data.toString(), `CO$${t.context.pin1}#LB\r`);
+            t.context.socket.write(examples.reports.complete);
+        });
+        t.context.tracker.on("report", () => {
+            t.end();
+        });
+        t.context.tracker.requestReport((err) => {
+            t.is(err, null);
             t.end();
         });
     });
