@@ -186,6 +186,39 @@ test.cb("handles status reports with no data", t => {
   t.context.socket.write("PA$");
 });
 
+test.cb("handles status reports with empty data", t => {
+    t.context.tracker.on("report", data => {
+        t.deepEqual(data.data, {
+            imei: "353990030327618",
+            date: null,
+            latitude: null,
+            longitude: null,
+            speed: null,
+            heading: null,
+            altitude: null,
+            internalBattery: null,
+            vehicleBattery: null,
+            gsmSignal: null,
+            gpsSatellites: 8,
+            vehicleContact: null,
+            accelerometer: null,
+            energySavings: null,
+            externalFeed: null,
+            gpsState: null,
+            alarmArmed: null,
+            engineCut: null,
+            siren: null,
+            ain2: null,
+            din1: null,
+            din2: null,
+            din3: null,
+            din4: null
+        });
+        t.end();
+    });
+    t.context.socket.write("PA$353990030327618#############8#");
+});
+
 test.cb("arms alarm", t => {
     t.context.heartbeat(() => {
         t.context.socket.on("data", data => {
@@ -227,13 +260,18 @@ test.cb("alarm arm throws error if response was incorrect", t => {
   });
 });
 
-test.cb("recognizes alarm", t => {
-  const message = "AA$353990030327618#011018#133015#22.64611#S#113.82682#E#SG";
+// -- ALARMS --
+test.cb("recognizes full alarm message", t => {
+  const message = "AA$353990030327618#133015#22.64611#S#113.82682#E#SG";
   t.context.tracker.on("alarm", (data) => {
       t.is(data.raw, message);
       t.is(data.type, "accelerometer");
+      var d = new Date();
+      d.setHours(13);
+      d.setMinutes(30);
+      d.setSeconds(15);
       t.deepEqual(data.data, {
-        date: new Date("2018-10-01T13:30:15.000Z"), 
+        date: d, 
         latitude: -22.0107685,
         longitude: 113.01378033333333
       });
@@ -242,13 +280,56 @@ test.cb("recognizes alarm", t => {
   t.context.socket.write(message);
 });
 
-test.cb("responds to alarm", t => {
+test.cb("responds to full alarm message", t => {
   t.context.socket.on("data", function(data){
       t.is(data.toString(), "AA$1#SG\r");
       t.end();
   });
-  t.context.socket.write("AA$353990030327618#011018#133015#22.64611#S#113.82682#E#SG");
+  t.context.socket.write("AA$353990030327618#133015#22.64611#S#113.82682#E#SG");
 });
+
+test.cb("recognizes bare alarm message", t => {
+    const message = "AA$353990030327618######SG";
+    t.context.tracker.on("alarm", (data) => {
+        t.is(data.raw, message);
+        t.is(data.type, "accelerometer");
+        t.deepEqual(data.data, {
+            date: null,
+            latitude: null,
+            longitude: null
+        });
+        t.end();
+    });
+    t.context.socket.write(message);
+});
+
+test.cb("responds to bare alarm message", t => {
+    t.context.socket.on("data", function(data){
+        t.is(data.toString(), "AA$1#SG\r");
+        t.end();
+    });
+    t.context.socket.write("AA$353990030327618######SG");
+});
+
+test.cb("recognizes incomplete alarm message", t => {
+    const message = "AA$353990030327618#133015#####SG";
+    t.context.tracker.on("alarm", (data) => {
+        t.is(data.raw, message);
+        t.is(data.type, "accelerometer");
+        var d = new Date();
+        d.setHours(13);
+        d.setMinutes(30);
+        d.setSeconds(15);
+        t.deepEqual(data.data, {
+            date: d,
+            latitude: null,
+            longitude: null
+        });
+        t.end();
+    });
+    t.context.socket.write(message);
+});
+// -- END ALARMS --
 
 test.cb("sets up the accelerometer sensibility", t => {
     t.context.heartbeat(() => {
