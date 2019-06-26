@@ -78,7 +78,7 @@ test.afterEach.cb(t => {
 // });
 
 test.cb("handles status reports", t => {
-    const message = "PA$353990030327618#011018#133015#3717.322482#N#00603.235948#W#120#115#085#38#121#25#8#68";
+    const message = "PA$353990030327618#011018#133015#3717.322482#N#00603.235948#W#120#115#085#38#121#33#8#68";
     t.context.tracker.on("report", data => {
         t.is(data.raw, message);
         t.deepEqual(data.data, {
@@ -91,7 +91,7 @@ test.cb("handles status reports", t => {
             altitude: 85,
             internalBattery: 3.8,
             vehicleBattery: 12.1,
-            gsmSignal: 25,
+            gsmSignal: 100,
             gpsSatellites: 8,
             vehicleContact: false,
             accelerometer: false,
