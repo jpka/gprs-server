@@ -77,40 +77,40 @@ test.afterEach.cb(t => {
 //     t.context.heartbeat();
 // });
 
-test.cb("handles status reports", t => {
-    const message = "PA$353990030327618#011018#133015#3717.322482#N#00603.235948#W#120#115#085#38#121#33#8#68";
-    t.context.tracker.on("report", data => {
-        t.is(data.raw, message);
-        t.deepEqual(data.data, {
-            imei: "353990030327618",
-            date: new Date("2018-10-01T13:30:15.000Z"),
-            latitude: 37.288708033333336,
-            longitude: -6.053932466666667,
-            speed: 120,
-            heading: 115,
-            altitude: 85,
-            internalBattery: 3.8,
-            vehicleBattery: 12.1,
-            gsmSignal: 100,
-            gpsSatellites: 8,
-            vehicleContact: false,
-            accelerometer: false,
-            energySavings: false,
-            externalFeed: true,
-            gpsState: false,
-            alarmArmed: true,
-            engineCut: true,
-            siren: false,
-            ain2: null,
-            din1: null,
-            din2: null,
-            din3: null,
-            din4: null
-        });
-        t.end();
-    });
-    t.context.socket.write(message);
-});
+// test.cb("handles status reports", t => {
+//     const message = "PA$353990030327618#011018#133015#3717.322482#N#00603.235948#W#120#115#085#38#121#33#8#68";
+//     t.context.tracker.on("report", data => {
+//         t.is(data.raw, message);
+//         t.deepEqual(data.data, {
+//             imei: "353990030327618",
+//             date: new Date("2018-10-01T13:30:15.000Z"),
+//             latitude: 37.288708033333336,
+//             longitude: -6.053932466666667,
+//             speed: 120,
+//             heading: 115,
+//             altitude: 85,
+//             internalBattery: 3.8,
+//             vehicleBattery: 12.1,
+//             gsmSignal: 100,
+//             gpsSatellites: 8,
+//             vehicleContact: false,
+//             accelerometer: false,
+//             energySavings: false,
+//             externalFeed: true,
+//             gpsState: false,
+//             alarmArmed: true,
+//             engineCut: true,
+//             siren: false,
+//             ain2: null,
+//             din1: null,
+//             din2: null,
+//             din3: null,
+//             din4: null
+//         });
+//         t.end();
+//     });
+//     t.context.socket.write(message);
+// });
 
 // test.cb("handles status reports with invalid data", t => {
 //   t.context.tracker.on("report", data => {
@@ -446,3 +446,17 @@ test.cb("handles status reports", t => {
 //     });
 // });
 // -- END FIRMWARE --
+
+test.cb("requestFirmwareVersion", t => {
+    t.context.heartbeat(() => {
+        t.context.socket.on("data", data => {
+            t.is(data.toString(), `CO$${t.context.pin1}#F\r`);
+            t.context.socket.write(`CO$${t.context.imei1}#123456`);
+        });
+        t.context.tracker.requestFirmwareVersion((err, version) => {
+            t.is(err, null);
+            t.is(version, "123456");
+            t.end();
+        });
+    });
+})
